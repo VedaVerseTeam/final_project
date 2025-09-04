@@ -1,0 +1,317 @@
+/* Make sure footer stays at bottom */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body > .content {
+  flex: 1;
+}
+
+body {
+  background: linear-gradient(to bottom right, #f5f2e7, #e8dcc2, #d6c39a);
+  font-family: 'Noto Serif', serif;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.heading{
+    text-align: center;
+    margin-top: 30px;
+     font-family: 'Tiro Devanagari Hindi', serif;
+     font-size: 30px;
+     color: #6B4226;
+}
+
+.scripture-window {
+  position: relative;
+  margin: 60px auto;
+  padding: 60px;
+  width: 90%;
+  max-width: 1200px;
+  min-height: 500px;
+  background: url('images/bg.jpg') no-repeat center center;
+  background-size: cover;
+  border: 8px solid #6B4226;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  font-family: 'Tiro Devanagari Hindi', serif;
+  text-align: center;
+  color: #2b1b0e;
+}
+
+/* New styles for the content inside the scripture window */
+.verse-info {
+  font-family: 'Noto Serif', serif;
+  font-size: 1.2rem;
+  color: #6B4226;
+  font-weight: bold;
+}
+
+.shlok {
+  font-family: 'Tiro Devanagari Hindi', serif;
+  font-size: 2rem;
+  line-height: 2.8rem;
+  margin: 20px 0;
+}
+
+.meaning {
+  font-family: 'Noto Serif', serif;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  color: #2b1b0e;
+}
+
+/* Scripture Text container */
+.scripture-text {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  padding: 20px;
+}
+
+/* Navigation Arrows */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.5rem;
+  color: #6B4226;
+  background: rgba(255, 248, 220, 0.6);
+  border: none;
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 50%;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.nav-arrow:hover {
+  background: rgba(210, 180, 140, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow.left { left: 15px; }
+.nav-arrow.right { right: 15px; }
+
+/* Sidebar */
+#toggleIndex {
+  background-color: #b8860b;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  transition: background 0.3s ease;
+}
+
+#toggleIndex:hover {
+  background-color: #daa520;
+  color: white;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100%;
+  background-color: #212529;
+  color: white;
+  padding: 15px;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+  transition: left 0.3s ease;
+  z-index: 1050;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  z-index: 1040;
+}
+
+#overlay.active {
+  display: block;
+}
+
+.accordion-button {
+  background-color: #343a40;
+  color: white;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #9d7c1b;
+  color: black;
+}
+
+.accordion-body {
+  background: #2c3034;
+  padding: 10px;
+}
+
+.verse-list {
+  list-style: none;
+  padding-left: 10px;
+  margin: 0;
+}
+
+.verse-list li {
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #ddd;
+}
+
+.verse-list li:hover {
+  background: rgba(255,193,7,0.2);
+  color: #ffc107;
+}
+
+/* Chatbot styles */
+#chatToggleBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #b47e09;
+  color: white;
+  font-size: 1.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+
+#chatToggleBtn:hover {
+  background: #8c6507;
+}
+
+#chatbotContainer {
+  display: none;
+  width: 350px;
+  height: 500px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #fdf8e1;
+  border: 2px solid #b47e09;
+  border-radius: 12px;
+  flex-direction: column;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.chat-header {
+  background: linear-gradient(90deg, #b47e09, #d4af37);
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  font-size: 1.2rem;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 1rem;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-message {
+  background: #d4af37;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin: 6px 0;
+  max-width: 70%;
+  align-self: flex-end;
+  text-align: right;
+}
+
+.bot-message {
+  background: #fff9db;
+  color: #222;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin: 6px 0;
+  max-width: 70%;
+  align-self: flex-start;
+}
+
+.chat-input-container {
+  display: flex;
+  padding: 8px;
+  border-top: 1px solid #ccc;
+}
+
+#chatInput {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+#sendBtn {
+  background: #b47e09;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 0 15px;
+  margin-left: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background: #8c6507;
+}
+
+.footer {
+  background-color: #000;
+  padding: 15px 0;
+  text-align: center;
+  color: white;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.github-icon {
+  width: 28px;
+  height: 28px;
+  filter: invert(1);
+  transition: transform 0.3s ease;
+}
+
+.github-icon:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}

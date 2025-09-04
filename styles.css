@@ -1,0 +1,209 @@
+/* Import a sacred + elegant font (Tiro Devanagari Hindi + Noto Serif) */
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Noto+Serif:wght@600&display=swap');
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Georgia', serif;
+  background: url('images/bg.jpg') no-repeat center center fixed;
+  opacity: 50;
+  background-size: cover;
+  color: #3b2a1a; /* deep brown for contrast */
+  text-align: center;
+   background-color: rgba(255, 255, 255, 0.3); /* overlay */
+  background-blend-mode: lighten;  /* or try multiply, overlay, screen */
+}
+
+
+
+
+
+
+.container1 {
+    text-align: center;   /* Center align text */
+    margin-top: 80px;     /* Push it down a little */
+}
+.container1 img {
+    width: 300px;
+    height: auto;
+}
+
+
+.divider {
+  border: none;
+  border-top: 2px solid #d4af37;
+  margin: 10px auto;
+  width: 60%;
+}
+
+.container1 h1 {
+    font-family: 'Tiro Devanagari Hindi', 'Noto Serif', serif;
+    font-size: 8rem;  /* Big and majestic */
+    color: #6B4226;   /* Old parchment brown */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3); /* Soft ancient effect */
+    letter-spacing: 1px;  /* Wider spacing for elegance */
+}
+
+
+.shloka-container {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 2.5rem;
+    color: #9b5402;  /* Dark scripture ink */
+    min-height: 50px; /* Prevent layout shift */
+}
+
+#shloka {
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+
+.tagline {
+    text-align: center;
+    margin-top: 25px;
+    font-family: 'Playfair Display', serif; /* Elegant serif */
+    font-size: 2rem;
+    font-style: italic;
+    color: #875b0a;   /* Deep scripture ink tone */
+    opacity: 0;
+    animation: fadeIn 3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+/* Start Journey Button */
+.start-btn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #b47e09, #d4af37);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.start-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
+}
+
+
+.feature-section {
+  overflow: hidden;
+  background: transparent;
+  padding : 30px 0;
+}
+
+.feature-slider {
+  display: flex;
+  gap: 20px;
+  animation: scroll-left 50s linear infinite; /* infinite scroll */
+}
+
+/* Feature Boxes */
+.feature-box {
+  flex: 0 0 250px;
+  background: white;
+  color: #333;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden; /* needed for shine */
+}
+
+.feature-box h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #6b21a8;
+  margin-bottom: 10px;
+}
+
+.feature-box p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.feature-box:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 0 20px rgba(111, 0, 255, 0.6);
+}
+
+/* Shine effect */
+.feature-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-20deg);
+}
+
+.feature-box:hover::before {
+  animation: shine 1s ease forwards;
+}
+
+@keyframes shine {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+/* Infinite scroll */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+
+.footer {
+  background-color: #000; /* black footer */
+  padding: 15px 0;
+  text-align: center;
+  color: white;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.github-icon {
+  width: 28px;
+  height: 28px;
+  filter: invert(1);
+  transition: transform 0.3s ease;
+}
+
+.github-icon:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
