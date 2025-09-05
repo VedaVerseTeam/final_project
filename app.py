@@ -1,136 +1,79 @@
 import os
-from flask_cors import CORS
-from dotenv import load_dotenv
-from flask import Flask, request, jsonify, send_from_directory
-import requests
 import mysql.connector
+from flask import Flask, render_template, jsonify
+from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables from .env file for local development
 load_dotenv()
 
-app = Flask(__name__, static_folder=".") # <-- Updated to serve static files from the root
+app = Flask(__name__)
 
-CORS(app) 
-
-# --- Configuration from .env ---
-API_KEY = os.getenv("API_KEY")
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_NAME = os.getenv("DB_NAME")
-
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-
-# --- Database Connection Helper ---
 def get_db_connection():
-    """Establishes and returns a database connection."""
+    """
+    Establishes a connection to the database.
+    It first tries to use Railway-provided environment variables,
+    then falls back to local environment variables from the .env file.
+    """
     try:
+        # Attempt to use Railway-provided environment variables for MySQL
+        host = os.getenv("MYSQLHOST")
+        user = os.getenv("MYSQLUSER")
+        password = os.getenv("MYSQLPASSWORD")
+        database = os.getenv("MYSQLDATABASE")
+        port = os.getenv("MYSQLPORT")
+
+        # If any of the Railway variables are missing, fall back to local .env variables
+        if not all([host, user, password, database, port]):
+            host = os.getenv("DB_HOST")
+            user = os.getenv("DB_USER")
+            password = os.getenv("DB_PASSWORD")
+            database = os.getenv("DB_NAME")
+            port = os.getenv("DB_PORT") # Use the local port
+
+        # Connect to the database
         conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
+            host=host,
+            user=user,
+            password=password,
+            database=database,
+            port=port
         )
         return conn
     except mysql.connector.Error as err:
-        print(f"Error connecting to database: {err}")
+        print(f"Error: {err}")
+        print("Failed to connect to the database. Please check your environment variables.")
         return None
 
-# --- Function to query the Gemini AI  ---
-def query_veda_verse(user_input):
-    headers = {
-        "Content-Type": "application/json",
-        "X-goog-api-key": API_KEY
-    }
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": user_input}
-                ]
-            }
-        ]
-    }
-    response = requests.post(GEMINI_URL, headers=headers, json=payload)
-    response.raise_for_status()
-    return response.json()
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# --- NEW: Route to serve the main HTML page ---
-@app.route("/")
-def serve_index():
-    return send_from_directory(app.static_folder, 'index.html')
+@app.route('/verses')
+def get_verses():
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({"error": "Could not connect to the database."}), 500
 
-# --- Route to handle chatbot requests ---
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.json
-    user_input = data.get("message", "")
-
-    if not user_input:
-        return jsonify({"reply": "No message received."}), 400
-
+    cursor = connection.cursor(dictionary=True)
+    
+    # Select a random verse from the 'verses' table
+    query = "SELECT verse_text FROM verses ORDER BY RAND() LIMIT 1"
+    
     try:
-        response_data = query_veda_verse(user_input)
-        reply = response_data["candidates"][0]["content"]["parts"][0]["text"]
-    except requests.exceptions.RequestException as e:
-        print(f"Request to Gemini API failed: {e}")
-        return jsonify({"reply": "⚠️ Network Error. Veda AI is unreachable."}), 503
-    except (KeyError, IndexError) as e:
-        print(f"Gemini API response format error: {e}")
-        return jsonify({"reply": "Sorry 🙏, I could not process that right now."}), 500
-    except Exception as e:
-        print(f"An unexpected error occurred in chat: {e}")
-        return jsonify({"reply": "An unexpected error occurred."}), 500
-
-    return jsonify({"reply": reply})
-
-# --- Route to fetch a specific verse from the database ---
-@app.route("/get_verse/<int:chapter_num>/<int:verse_num>", methods=["GET"])
-def get_verse(chapter_num, verse_num):
-    conn = None
-    try:
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({"error": "Database connection failed"}), 500
-
-        cursor = conn.cursor(dictionary=True)
-        query = """
-            SELECT shloka, shlok_meaning 
-            FROM scripture
-            WHERE scrip_name = 'Gita' AND chapter = %s AND verse = %s
-        """
-        cursor.execute(query, (chapter_num, verse_num))
-        verse_data = cursor.fetchone()
-
-        if verse_data:
-            return jsonify({
-                "chapter": chapter_num,
-                "verse": verse_num,
-                "shlok": verse_data["shloka"], 
-                "meaning": verse_data["shlok_meaning"] 
-            })
+        cursor.execute(query)
+        verse = cursor.fetchone()
+        if verse:
+            return jsonify(verse)
         else:
-            return jsonify({"error": "Verse not found"}), 404
-
-    except mysql.connector.Error as err:
-        print(f"Database query error: {err}")
-        return jsonify({"error": f"Database error: {err}"}), 500
+            return jsonify({"error": "No verses found in the database."}), 404
     except Exception as e:
-        print(f"An unexpected error occurred while fetching verse: {e}")
-        return jsonify({"error": "An unexpected server error occurred."}), 500
+        print(f"An error occurred while fetching the verse: {e}")
+        return jsonify({"error": "An error occurred while fetching the verse."}), 500
     finally:
-        if conn:
-            conn.close()
+        cursor.close()
+        connection.close()
 
-# --- Serve static files like CSS and JS ---
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory(app.static_folder, filename)
-
-if __name__ == "__main__":
-    try:
-        app.run(debug=True, port=5000)
-    except Exception as e:
-        print(f"FAILED TO START FLASK APP: {e}")
-        import traceback
-        traceback.print_exc()
+if __name__ == '__main__':
+    # When deploying to Railway, the port is provided by the environment
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
