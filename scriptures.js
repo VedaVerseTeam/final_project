@@ -18,7 +18,7 @@ function loadVerse(chapter, verse) {
 
   // Make the API call after a short delay to allow for the fade-out
   setTimeout(() => {
-    fetch(`http://127.0.0.1:5000/get_verse/${currentChapter}/${currentVerse}`)
+    fetch(`https://finalproject-production-e8e4.up.railway.app/get_verse/${currentChapter}/${currentVerse}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -161,11 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
     chatInput.value = "";
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    fetch("http://127.0.0.1:5000/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg })
-    })
+    fetch("https://finalproject-production-e8e4.up.railway.app/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: msg })
+})
     .then(res => res.json())
     .then(data => {
       let botMsg = document.createElement("div");
