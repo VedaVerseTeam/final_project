@@ -1,14 +1,15 @@
 import os
 from flask_cors import CORS
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import requests
 import mysql.connector
 
 # Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".") # <-- Updated to serve static files from the root
+
 CORS(app) 
 
 # --- Configuration from .env ---
@@ -54,6 +55,11 @@ def query_veda_verse(user_input):
     response.raise_for_status()
     return response.json()
 
+# --- NEW: Route to serve the main HTML page ---
+@app.route("/")
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
 # --- Route to handle chatbot requests ---
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -78,7 +84,6 @@ def chat():
 
     return jsonify({"reply": reply})
 
-
 # --- Route to fetch a specific verse from the database ---
 @app.route("/get_verse/<int:chapter_num>/<int:verse_num>", methods=["GET"])
 def get_verse(chapter_num, verse_num):
@@ -90,7 +95,7 @@ def get_verse(chapter_num, verse_num):
 
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT shloka, shlok_meaning  # <-- Changed 'shlok' to 'shloka' here
+            SELECT shloka, shlok_meaning 
             FROM scripture
             WHERE scrip_name = 'Gita' AND chapter = %s AND verse = %s
         """
@@ -101,8 +106,8 @@ def get_verse(chapter_num, verse_num):
             return jsonify({
                 "chapter": chapter_num,
                 "verse": verse_num,
-                "shlok": verse_data["shloka"],        # <-- Changed 'shlok' to 'shloka' here
-                "meaning": verse_data["shlok_meaning"] # This one was correct
+                "shlok": verse_data["shloka"], 
+                "meaning": verse_data["shlok_meaning"] 
             })
         else:
             return jsonify({"error": "Verse not found"}), 404
@@ -117,7 +122,10 @@ def get_verse(chapter_num, verse_num):
         if conn:
             conn.close()
 
-
+# --- Serve static files like CSS and JS ---
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(app.static_folder, filename)
 
 if __name__ == "__main__":
     try:
