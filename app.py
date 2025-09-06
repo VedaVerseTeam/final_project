@@ -15,19 +15,13 @@ def get_db_connection():
     then falls back to local environment variables from the .env file.
     """
     try:
-        host = os.getenv("DB_HOST")
-        user = os.getenv("DB_USER")
-        password = os.getenv("DB_PASSWORD")
-        database = os.getenv("DB_NAME")
-        port = os.getenv("DB_PORT") # Use the local port
-
         # Connect to the database
         conn = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=port
+            host="vedaverse.c0kgbzwsu3pg.ap-northeast-1.rds.amazonaws.com",
+            user="veda",
+            password="Veda#12345",
+            database="vedaverse",
+            port=3306
         )
         return conn
     except mysql.connector.Error as err:
